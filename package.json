@@ -1,0 +1,31 @@
+{
+  "name": "koa-full-auth",
+  "version": "0.1.0",
+  "description": "Full user auth implementation middleware for koa. Edit",
+  "main": "index.js",
+  "repository": "git@github.com:diosmosis/koa-full-auth.git",
+  "author": "diosmosis",
+  "license": "MIT",
+  "scripts": {
+    "lint": "eslint .",
+    "test": "mocha --compilers js:babel-register --require babel-polyfill './tests/**/*.spec.js'"
+  },
+  "devDependencies": {
+    "babel-core": "^6.25.0",
+    "babel-eslint": "^7.2.3",
+    "babel-polyfill": "^6.23.0",
+    "babel-preset-env": "^1.5.2",
+    "chai": "^4.0.2",
+    "eslint": "^4.0.0",
+    "eslint-config-airbnb-base": "^11.2.0",
+    "eslint-plugin-babel": "^4.1.1",
+    "eslint-plugin-import": "^2.3.0",
+    "koa": "^2.2.0",
+    "mocha": "^3.4.2",
+    "pre-commit": "^1.2.2"
+  },
+  "dependencies": {},
+  "pre-commit": [
+    "lint"
+  ]
+}
