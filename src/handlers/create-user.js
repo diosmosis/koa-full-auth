@@ -1,15 +1,8 @@
 'use strict';
 
 import * as querystring from 'querystring';
-import * as crypto from 'crypto';
-import promisify from 'es6-promisify';
-import * as confirmLinkToken from './confirm-link-token';
-
-const PBKDF2_ITERATIONS = 4096;
-const PBKDF2_DIGEST = 'sha512';
-
-const randomBytes = promisify(crypto.randomBytes);
-const pbkdf2 = promisify(crypto.pbkdf2);
+import * as confirmLinkToken from '../confirm-link-token';
+import * as passwords from '../passwords';
 
 export default async function createUser(ctx, {
   serviceName,
@@ -29,7 +22,7 @@ export default async function createUser(ctx, {
     throw new Error('"password" POST param is required');
   }
 
-  const { salt, hash } = await createSaltAndHash(saltLength, password);
+  const { salt, hash } = await passwords.createSaltAndHash(saltLength, password);
 
   await userStore.saveUser(email, hash, salt);
 
@@ -60,10 +53,4 @@ function makeDefaultConfirmationEmail({ confirmEmailUiLink, serviceName, subject
     <a href="${confirmEmailUiLink}">${confirmEmailUiLink}</a>
   </body>
 </html>`;
-}
-
-async function createSaltAndHash(saltLength, password) {
-  const salt = await randomBytes(saltLength);
-  const hash = (await pbkdf2(password, salt, PBKDF2_ITERATIONS, saltLength, PBKDF2_DIGEST));
-  return { salt: salt.toString('hex'), hash: hash.toString('hex') };
 }

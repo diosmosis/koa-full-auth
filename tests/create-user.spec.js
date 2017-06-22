@@ -4,7 +4,7 @@ import startServer from './server';
 import mockUserStore from './mock-user-store';
 import * as mockEmailService from './mock-email-service';
 
-describe.only('create user', () => {
+describe('create user', () => {
   let server;
   before(() => {
     server = startServer();

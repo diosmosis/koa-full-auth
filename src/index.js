@@ -1,6 +1,6 @@
 'use strict';
 
-import createUserHandler from './create-user';
+import * as handlers from './handlers';
 
 const REQUIRED_OPTIONS = [
   'serviceName',
@@ -24,6 +24,7 @@ const REQUIRED_OPTIONS = [
  *     - "body": the HTML email body
  * @param {Object} options.userStore (Required) The user store object used to save/fetch users.
  * @param {Function} options.userStore.saveUser (Required) Accepts an email, hash and salt.
+ * @param {Function} options.userStore.getUser (Required) Gets user info by email.
  * @param {Function} options.makeConfirmationEmail A function that generates HTML for the confirm new user email.
  * @param {number} options.saltLength The size in bytes of the salt.
  * @param {Object} options.paths Custom paths for each route.
@@ -52,16 +53,25 @@ async function fullAuthMiddleware({ options, routes }, ctx, next) {
 
 function makeRoutes({
   createUser = ['POST', '/users'],
+  login = ['POST', '/login'],
 } = {}) {
-  const specs = [createUser];
+  const specs = [
+    createUser,
+    login,
+  ];
+
+  const handlersList = [
+    handlers.createUser,
+    handlers.login,
+  ];
 
   const routes = {};
-  specs.forEach(([method, path]) => {
+  specs.forEach(([method, path], index) => {
     if (!routes[method]) {
       routes[method] = {};
     }
 
-    routes[method][path] = createUserHandler;
+    routes[method][path] = handlersList[index];
   });
   return routes;
 }
