@@ -10,9 +10,9 @@ const TEST_EMAIL2 = 'test2@testytestersons.com';
 const TEST_SALT = 'testsalt';
 const TEST_PWD = 'testpassword';
 
-describe('change password', () => {
+describe('confirm new user', () => {
   let server;
-  before(async () => {
+  before(() => {
     server = startServer();
   });
   after(() => server.close());
@@ -25,86 +25,55 @@ describe('change password', () => {
     mockUserStore.createUser(TEST_EMAIL2, passwordHash, TEST_SALT, false);
   });
 
-  it('should change the password of a confirmed user', async () => {
-    const newPassword = 'newpass';
-    const token = emailToken.generate('change-password', mockUserStore.getUser(TEST_EMAIL));
+  it('should confirm an unconfirmed user', async () => {
+    expect(mockUserStore.getUser(TEST_EMAIL2).confirmed).to.be.false;
+
+    const token = emailToken.generate('create-user', mockUserStore.getUser(TEST_EMAIL2));
 
     const response = await request({
       method: 'POST',
-      uri: 'http://localhost:3000/users/password/reset',
-      json: true,
-      resolveWithFullResponse: true,
-      body: {
-        email: TEST_EMAIL,
-        token,
-        newPassword,
-      },
-    });
-
-    expect(response.statusCode).to.equal(204);
-
-    const newHash = await passwords.computeHash(newPassword, TEST_SALT);
-    expect(mockUserStore.getUser(TEST_EMAIL).passwordHash).to.equal(newHash);
-  });
-
-  it('should change the password of an unconfirmed user', async () => {
-    const newPassword = 'newpass2';
-
-    const timeInPast = new Date();
-    timeInPast.setMinutes(0, 0, 0);
-    timeInPast.setHours(2);
-
-    const token = emailToken.generateForTime('change-password', mockUserStore.getUser(TEST_EMAIL2),
-      timeInPast);
-
-    const response = await request({
-      method: 'POST',
-      uri: 'http://localhost:3000/users/password/reset',
+      uri: 'http://localhost:3000/users/confirm',
       json: true,
       resolveWithFullResponse: true,
       body: {
         email: TEST_EMAIL2,
         token,
-        newPassword,
       },
     });
 
     expect(response.statusCode).to.equal(204);
-
-    const newHash = await passwords.computeHash(newPassword, TEST_SALT);
-    expect(mockUserStore.getUser(TEST_EMAIL2).passwordHash).to.equal(newHash);
+    expect(mockUserStore.getUser(TEST_EMAIL2).confirmed).to.be.true;
   });
 
-  it('should not change the password if the email does not exist', async () => {
-    const response = await request({
-      method: 'POST',
-      uri: 'http://localhost:3000/users/password/reset',
-      json: true,
-      resolveWithFullResponse: true,
-      body: {
-        email: 'whatever@whatever.com',
-        token: 'garbagetoken',
-        newPassword: 'sdlkfjsadlkf',
-      },
-      simple: false,
-    });
+  it('should have no effect on a confirmed user', async () => {
+    expect(mockUserStore.getUser(TEST_EMAIL).confirmed).to.be.true;
 
-    expect(response.statusCode).to.equal(400);
-    expect(response.body.error).to.equal('Invalid or expired token.');
-  });
-
-  it('should not change the password if the token is incorrect', async () => {
-    const newPassword = 'newpass';
+    const token = emailToken.generate('create-user', mockUserStore.getUser(TEST_EMAIL));
 
     const response = await request({
       method: 'POST',
-      uri: 'http://localhost:3000/users/password/reset',
+      uri: 'http://localhost:3000/users/confirm',
       json: true,
       resolveWithFullResponse: true,
       body: {
         email: TEST_EMAIL,
-        token: 'sdklsadjfslakdjfalskjf',
-        newPassword,
+        token,
+      },
+    });
+
+    expect(response.statusCode).to.equal(204);
+    expect(mockUserStore.getUser(TEST_EMAIL).confirmed).to.be.true;
+  });
+
+  it('should not confirm the user if the email does not exist', async () => {
+    const response = await request({
+      method: 'POST',
+      uri: 'http://localhost:3000/users/confirm',
+      json: true,
+      resolveWithFullResponse: true,
+      body: {
+        email: 'whatever@whatever.com',
+        token: 'slkajdfsdlkf',
       },
       simple: false,
     });
@@ -113,25 +82,41 @@ describe('change password', () => {
     expect(response.body.error).to.equal('Invalid or expired token.');
   });
 
-  it('should not change the password if the token is expired', async () => {
-    const newPassword = 'newpass2';
+  it('should not confirm the user if the token is incorrect', async () => {
+    const response = await request({
+      method: 'POST',
+      uri: 'http://localhost:3000/users/confirm',
+      json: true,
+      resolveWithFullResponse: true,
+      body: {
+        email: TEST_EMAIL2,
+        token: 'slkdfjasdlfj',
+      },
+      simple: false,
+    });
+
+    expect(response.statusCode).to.equal(400);
+    expect(response.body.error).to.equal('Invalid or expired token.');
+  });
+
+  it('should not confirm the user if the token is expired', async () => {
+    expect(mockUserStore.getUser(TEST_EMAIL2).confirmed).to.be.false;
 
     const timeInPast = new Date();
     timeInPast.setMinutes(0, 0, 0);
     timeInPast.setDate(timeInPast.getDate() - 1);
 
-    const token = emailToken.generateForTime('change-password', mockUserStore.getUser(TEST_EMAIL2),
+    const token = emailToken.generateForTime('create-user', mockUserStore.getUser(TEST_EMAIL2),
       timeInPast);
 
     const response = await request({
       method: 'POST',
-      uri: 'http://localhost:3000/users/password/reset',
+      uri: 'http://localhost:3000/users/confirm',
       json: true,
       resolveWithFullResponse: true,
       body: {
         email: TEST_EMAIL2,
         token,
-        newPassword,
       },
       simple: false,
     });

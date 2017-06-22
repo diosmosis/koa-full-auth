@@ -2,7 +2,7 @@ import Koa from 'koa';
 import bodyParser from 'koa-bodyparser';
 import jwt from 'koa-jwt';
 import _ from 'koa-route';
-import { createUser, login, requestPasswordChange, changePassword } from '..';
+import { createUser, login, requestPasswordChange, changePassword, confirmUser } from '..';
 import mockUserStore from './mock-user-store';
 import * as mockEmailService from './mock-email-service';
 
@@ -23,10 +23,14 @@ export default function startTestServer(options = {}, { requireJwt } = {}) {
   app.use(bodyParser());
 
   if (requireJwt) {
-    app.use(jwt({ secret: 'testSecret' }).unless({ path: '/login' }));
+    app.use(
+      jwt({ secret: 'testSecret' })
+        .unless({ path: ['/login', '/users/password/reset'] }),
+    );
   }
 
   app.use(_.post('/users', createUser.handler(testOptions)));
+  app.use(_.post('/users/confirm', confirmUser.handler(testOptions)));
   app.use(_.post('/login', login.handler(testOptions)));
   app.use(_.post('/users/password', requestPasswordChange.handler(testOptions)));
   app.use(_.post('/users/password/reset', changePassword.handler(testOptions)));
