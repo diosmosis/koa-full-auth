@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import startServer from './server';
 
-describe('reset password', () => {
+describe.skip('reset password', () => {
   let server;
   before(() => {
     server = startServer();

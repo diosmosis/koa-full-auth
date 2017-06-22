@@ -1,3 +1,1 @@
-import fullAuthMiddleware from './src';
-
-export default fullAuthMiddleware;
+export * from './src';
