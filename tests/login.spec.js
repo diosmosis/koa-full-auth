@@ -17,8 +17,8 @@ describe('login', () => {
     });
 
     const passwordHash = await passwords.computeHash(TEST_PWD, TEST_SALT);
-    mockUserStore.saveUser(TEST_EMAIL, passwordHash, TEST_SALT, true);
-    mockUserStore.saveUser(TEST_EMAIL2, passwordHash, TEST_SALT, false);
+    mockUserStore.createUser(TEST_EMAIL, passwordHash, TEST_SALT, true);
+    mockUserStore.createUser(TEST_EMAIL2, passwordHash, TEST_SALT, false);
   });
   after(() => server.close());
 
@@ -35,7 +35,7 @@ describe('login', () => {
       },
     });
 
-    expect(response.statusCode).to.equal(403);
+    expect(response.statusCode).to.equal(401);
     expect(response.body.error).to.equal('Invalid email or password.');
   });
 
@@ -52,7 +52,7 @@ describe('login', () => {
       },
     });
 
-    expect(response.statusCode).to.equal(403);
+    expect(response.statusCode).to.equal(401);
     expect(response.body.error).to.equal('Invalid email or password.');
   });
 
@@ -69,7 +69,7 @@ describe('login', () => {
       },
     });
 
-    expect(response.statusCode).to.equal(403);
+    expect(response.statusCode).to.equal(401);
     expect(response.body.error).to.equal('Invalid email or password.');
   });
 

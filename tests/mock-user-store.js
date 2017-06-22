@@ -1,7 +1,7 @@
 let allUsers = [];
 
 const memoryBackendStore = {
-  saveUser: function saveUserInMemory(email, hash, salt, confirmed = false) {
+  createUser: function createUser(email, hash, salt, confirmed = false) {
     const user = {
       email,
       passwordHash: hash,
@@ -10,6 +10,11 @@ const memoryBackendStore = {
     };
 
     allUsers.push(user);
+
+    return user;
+  },
+  saveUser: function saveUser(newUser) {
+    allUsers = allUsers.map(u => (u.email === newUser.email ? newUser : u));
   },
   getUser: function getUser(email) {
     return allUsers.find(u => u.email === email);

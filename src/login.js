@@ -4,36 +4,46 @@ import * as crypto from 'crypto';
 import jwt from 'jsonwebtoken';
 import * as passwords from './passwords';
 
-export default function login({
-  userStore,
-  jwtSecret,
-} = {}) {
-  return async (ctx) => {
-    const { email, password } = ctx.request.body || {};
-
-    const user = await userStore.getUser(email);
-    if (!user || !user.confirmed) {
-      ctx.status = 403;
-      ctx.body = {
-        error: 'Invalid email or password.',
-      };
-
-      return;
-    }
-
-    const hash = await passwords.computeHash(password, user.salt);
-    if (!crypto.timingSafeEqual(Buffer.from(hash, 'ascii'), Buffer.from(user.passwordHash, 'ascii'))) {
-      ctx.status = 403;
-      ctx.body = {
-        error: 'Invalid email or password.',
-      };
-
-      return;
-    }
-
-    ctx.status = 200;
+async function login(
+  {
+    userStore,
+    jwtSecret,
+  } = {},
+  ctx,
+  email,
+  password,
+) {
+  const user = await userStore.getUser(email);
+  if (!user || !user.confirmed) {
+    ctx.status = 401;
     ctx.body = {
-      token: jwt.sign({ email }, jwtSecret),
+      error: 'Invalid email or password.',
     };
+
+    return;
+  }
+
+  const hash = await passwords.computeHash(password, user.salt);
+  if (!crypto.timingSafeEqual(Buffer.from(hash, 'ascii'), Buffer.from(user.passwordHash, 'ascii'))) {
+    ctx.status = 401;
+    ctx.body = {
+      error: 'Invalid email or password.',
+    };
+
+    return;
+  }
+
+  ctx.status = 200;
+  ctx.body = {
+    token: jwt.sign({ email }, jwtSecret),
   };
 }
+
+login.handler = function createLoginHandler(options) {
+  return async (ctx) => {
+    const { email, password } = ctx.request.body || {};
+    return login(options, ctx, email, password);
+  };
+};
+
+export default login;

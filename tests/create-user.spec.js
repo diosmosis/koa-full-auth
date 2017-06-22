@@ -39,7 +39,7 @@ describe('create user', () => {
 
     const emails = mockEmailService.getEmails();
     expect(emails.length).to.equal(1);
-    expect(emails[0].subject).to.equal('test service: Confirm your account');
+    expect(emails[0].subject).to.equal('test service - Confirm your account');
     expect(emails[0].to).to.deep.equal(['testperson@testytestersons.com']);
 
     const baseUrl = 'https://app.com/user/verify?email=testperson%40testytestersons.com&token=';
