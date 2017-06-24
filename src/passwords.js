@@ -19,6 +19,6 @@ export async function createSaltAndHash(saltLength, password) {
 }
 
 export async function computeHash(password, salt) {
-  const hash = await pbkdf2(password, salt, PBKDF2_ITERATIONS, HASH_LENGTH, PBKDF2_DIGEST);
+  const hash = await pbkdf2(password, Buffer.from(salt, 'hex'), PBKDF2_ITERATIONS, HASH_LENGTH, PBKDF2_DIGEST);
   return hash.toString('hex');
 }
