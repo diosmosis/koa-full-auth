@@ -10,7 +10,7 @@ const pbkdf2 = promisify(crypto.pbkdf2);
 
 export async function createSaltAndHash(saltLength, password) {
   const salt = await randomBytes(saltLength);
-  const hash = await pbkdf2(password, salt, PBKDF2_ITERATIONS, saltLength, PBKDF2_DIGEST);
+  const hash = await pbkdf2(password, salt, PBKDF2_ITERATIONS, HASH_LENGTH, PBKDF2_DIGEST);
 
   return {
     salt: salt.toString('hex'),
