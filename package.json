@@ -1,6 +1,6 @@
 {
   "name": "koa-full-auth",
-  "version": "0.1.0-rc2",
+  "version": "0.1.0-rc3",
   "description": "Full user auth implementation middleware for koa. Edit",
   "main": "index.js",
   "repository": "git@github.com:diosmosis/koa-full-auth.git",
