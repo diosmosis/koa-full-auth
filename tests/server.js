@@ -6,7 +6,11 @@ import { createUser, login, requestPasswordChange, changePassword, confirmUser }
 import mockUserStore from './mock-user-store';
 import * as mockEmailService from './mock-email-service';
 
-export default function startTestServer(options = {}, { requireJwt } = {}) {
+const TEST_JWT_SECRET = 'testSecret';
+
+export { TEST_JWT_SECRET };
+
+export function startServer(options = {}, { requireJwt } = {}) {
   mockEmailService.clear();
   mockUserStore.clear();
 
@@ -16,7 +20,10 @@ export default function startTestServer(options = {}, { requireJwt } = {}) {
     resetPasswordLink: 'https://app.com/user/password/reset',
     sendEmail: mockEmailService.sendEmail,
     userStore: mockUserStore,
-    jwtSecret: 'testSecret',
+    jwtSecret: TEST_JWT_SECRET,
+    jwtSigningOptions: {
+      expiresIn: '1d',
+    },
   }, options);
 
   const app = new Koa();
@@ -24,7 +31,7 @@ export default function startTestServer(options = {}, { requireJwt } = {}) {
 
   if (requireJwt) {
     app.use(
-      jwt({ secret: 'testSecret' })
+      jwt({ secret: TEST_JWT_SECRET })
         .unless({ path: ['/login', '/users/password/reset'] }),
     );
   }
