@@ -2,7 +2,7 @@ import { expect } from 'chai';
 import request from 'request-promise';
 import * as passwords from '../src/passwords';
 import * as emailToken from '../src/email-token';
-import startServer from './server';
+import { startServer } from './server';
 import mockUserStore from './mock-user-store';
 
 const TEST_EMAIL = 'test@testytestersons.com';

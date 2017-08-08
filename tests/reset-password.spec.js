@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import startServer from './server';
+import { startServer } from './server';
 
 describe.skip('reset password', () => {
   let server;

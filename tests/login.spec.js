@@ -1,6 +1,7 @@
 import { expect } from 'chai';
 import request from 'request-promise';
-import startServer from './server';
+import jwt from 'jsonwebtoken';
+import { startServer, TEST_JWT_SECRET } from './server';
 import mockUserStore from './mock-user-store';
 import * as passwords from '../src/passwords';
 
@@ -87,6 +88,11 @@ describe('login', () => {
 
     expect(response.statusCode).to.equal(200);
     expect(response.body.token).to.be.ok;
+
+    // check token expires at the correct time (test the jwtSigningOptions are used)
+    const decoded = jwt.verify(response.body.token, TEST_JWT_SECRET);
+    expect(decoded.exp).to.be.ok;
+    expect(decoded.exp - decoded.iat).to.equal(86400);
 
     const testJwtResponse = await request({
       method: 'GET',

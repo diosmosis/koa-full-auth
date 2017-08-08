@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import request from 'request-promise';
 import * as passwords from '../src/passwords';
-import startServer from './server';
+import { startServer } from './server';
 import mockUserStore from './mock-user-store';
 import * as mockEmailService from './mock-email-service';
 

@@ -2,12 +2,16 @@
 
 import * as crypto from 'crypto';
 import jwt from 'jsonwebtoken';
+import promisify from 'es6-promisify';
 import * as passwords from './passwords';
+
+const signAsync = promisify(jwt.sign);
 
 async function login(
   {
     userStore,
     jwtSecret,
+    jwtSigningOptions,
   } = {},
   ctx,
   email,
@@ -33,9 +37,11 @@ async function login(
     return;
   }
 
+  const token = await signAsync({ email }, jwtSecret, jwtSigningOptions || {});
+
   ctx.status = 200;
   ctx.body = {
-    token: jwt.sign({ email }, jwtSecret),
+    token,
   };
 }
 
