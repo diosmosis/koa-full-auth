@@ -34,8 +34,7 @@ export function startServer(options = {}, { requireJwt } = {}) {
     app.use(setSecret.middleware(testOptions));
 
     app.use(
-      jwt({ secret: TEST_JWT_SECRET })
-        .unless({ path: ['/login', '/users/password/reset', '/noauthrequired'] }),
+      jwt().unless({ path: ['/login', '/users/password/reset', '/noauthrequired'] }),
     );
 
     app.use(reSign.middleware(testOptions));
