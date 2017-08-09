@@ -2,7 +2,8 @@ import Koa from 'koa';
 import bodyParser from 'koa-bodyparser';
 import jwt from 'koa-jwt';
 import _ from 'koa-route';
-import { createUser, login, requestPasswordChange, changePassword, confirmUser } from '..';
+import { createUser, login, requestPasswordChange, changePassword, confirmUser,
+  reSign, setSecret } from '..';
 import mockUserStore from './mock-user-store';
 import * as mockEmailService from './mock-email-service';
 
@@ -30,10 +31,14 @@ export function startServer(options = {}, { requireJwt } = {}) {
   app.use(bodyParser());
 
   if (requireJwt) {
+    app.use(setSecret.middleware(testOptions));
+
     app.use(
       jwt({ secret: TEST_JWT_SECRET })
-        .unless({ path: ['/login', '/users/password/reset'] }),
+        .unless({ path: ['/login', '/users/password/reset', '/noauthrequired'] }),
     );
+
+    app.use(reSign.middleware(testOptions));
   }
 
   app.use(_.post('/users', createUser.handler(testOptions)));
@@ -45,6 +50,11 @@ export function startServer(options = {}, { requireJwt } = {}) {
   app.use(_.get('/afterauth', (ctx) => {
     ctx.body = {
       message: 'hello world',
+    };
+  }));
+  app.use(_.get('/noauthrequired', (ctx) => {
+    ctx.body = {
+      message: 'finished!',
     };
   }));
   return app.listen(3000);

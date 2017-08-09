@@ -5,6 +5,8 @@ import login from './login';
 import requestPasswordChange from './request-password-change';
 import changePassword from './change-password';
 import confirmUser from './confirm-user';
+import setSecret from './set-secret';
+import reSign from './resign';
 
 export {
   createUser,
@@ -12,4 +14,6 @@ export {
   requestPasswordChange,
   changePassword,
   confirmUser,
+  setSecret,
+  reSign,
 };
