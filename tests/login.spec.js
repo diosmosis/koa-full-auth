@@ -12,12 +12,13 @@ const TEST_PWD = 'testpassword';
 
 describe('login', () => {
   let server;
+  let passwordHash;
   before(async () => {
     server = startServer({}, {
       requireJwt: true,
     });
 
-    const passwordHash = await passwords.computeHash(TEST_PWD, TEST_SALT);
+    passwordHash = await passwords.computeHash(TEST_PWD, TEST_SALT);
     mockUserStore.createUser(TEST_EMAIL, passwordHash, TEST_SALT, true);
     mockUserStore.createUser(TEST_EMAIL2, passwordHash, TEST_SALT, false);
   });
@@ -90,7 +91,7 @@ describe('login', () => {
     expect(response.body.token).to.be.ok;
 
     // check token expires at the correct time (test the jwtSigningOptions are used)
-    const decoded = jwt.verify(response.body.token, TEST_JWT_SECRET);
+    const decoded = jwt.verify(response.body.token, TEST_JWT_SECRET + passwordHash);
     expect(decoded.exp).to.be.ok;
     expect(decoded.exp - decoded.iat).to.equal(86400);
 

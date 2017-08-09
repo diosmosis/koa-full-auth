@@ -37,7 +37,7 @@ async function login(
     return;
   }
 
-  const token = await signAsync({ email }, jwtSecret, jwtSigningOptions || {});
+  const token = await signAsync({ email }, jwtSecret + user.passwordHash, jwtSigningOptions || {});
 
   ctx.status = 200;
   ctx.body = {
