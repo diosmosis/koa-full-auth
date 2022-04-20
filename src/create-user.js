@@ -6,7 +6,7 @@ import * as passwords from './passwords';
 
 async function createUser(
   {
-    serviceName,
+    serviceName2,
     confirmAccountLink,
     sendEmail,
     userStore,
