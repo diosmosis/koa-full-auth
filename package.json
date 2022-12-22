@@ -33,7 +33,7 @@
   },
   "dependencies": {
     "es6-promisify": "^5.0.0",
-    "jsonwebtoken": "^7.4.1",
+    "jsonwebtoken": "^9.0.0",
     "koa-bodyparser": "3",
     "koa-passport": "^3.0.0",
     "nodemailer": "^4.0.1",
